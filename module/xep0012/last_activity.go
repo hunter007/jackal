@@ -14,29 +14,32 @@ import (
 	"github.com/ortuman/jackal/module/xep0030"
 	"github.com/ortuman/jackal/router"
 	"github.com/ortuman/jackal/storage"
-	"github.com/ortuman/jackal/stream"
 	"github.com/ortuman/jackal/xmpp"
 	"github.com/ortuman/jackal/xmpp/jid"
 )
+
+const mailboxSize = 1024
 
 const lastActivityNamespace = "jabber:iq:last"
 
 // LastActivity represents a last activity stream module.
 type LastActivity struct {
-	stm       stream.C2S
-	startTime time.Time
+	startTime  time.Time
+	actorCh    chan func()
+	shutdownCh <-chan struct{}
 }
 
 // New returns a last activity IQ handler module.
-func New(stm stream.C2S) *LastActivity {
-	return &LastActivity{stm: stm, startTime: time.Now()}
-}
-
-// RegisterDisco registers disco entity features/items
-// associated to last activity module.
-func (x *LastActivity) RegisterDisco(discoInfo *xep0030.DiscoInfo) {
-	discoInfo.Entity(x.stm.Domain(), "").AddFeature(lastActivityNamespace)
-	discoInfo.Entity(x.stm.JID().ToBareJID().String(), "").AddFeature(lastActivityNamespace)
+func New(disco *xep0030.DiscoInfo, shutdownCh <-chan struct{}) *LastActivity {
+	x := &LastActivity{
+		startTime:  time.Now(),
+		actorCh:    make(chan func(), mailboxSize),
+		shutdownCh: shutdownCh,
+	}
+	go x.loop()
+	disco.RegisterServerFeature(lastActivityNamespace)
+	disco.RegisterAccountFeature(lastActivityNamespace)
+	return x
 }
 
 // MatchesIQ returns whether or not an IQ should be
@@ -48,24 +51,31 @@ func (x *LastActivity) MatchesIQ(iq *xmpp.IQ) bool {
 // ProcessIQ processes a last activity IQ taking according actions
 // over the associated stream.
 func (x *LastActivity) ProcessIQ(iq *xmpp.IQ) {
+	x.actorCh <- func() { x.processIQ(iq) }
+}
+
+func (x *LastActivity) loop() {
+	for {
+		select {
+		case f := <-x.actorCh:
+			f()
+		case <-x.shutdownCh:
+			return
+		}
+	}
+}
+
+func (x *LastActivity) processIQ(iq *xmpp.IQ) {
+	fromJID := iq.FromJID()
 	toJID := iq.ToJID()
 	if toJID.IsServer() {
 		x.sendServerUptime(iq)
 	} else if toJID.IsBare() {
-		ri, err := storage.Instance().FetchRosterItem(x.stm.Username(), toJID.ToBareJID().String())
-		if err != nil {
-			log.Error(err)
-			x.stm.SendElement(iq.InternalServerError())
-			return
+		if x.isSubscribedTo(toJID, fromJID) {
+			x.sendUserLastActivity(iq, toJID)
+		} else {
+			router.Route(iq.ForbiddenError())
 		}
-		if ri != nil {
-			switch ri.Subscription {
-			case rostermodel.SubscriptionTo, rostermodel.SubscriptionBoth:
-				x.sendUserLastActivity(iq, toJID)
-				return
-			}
-		}
-		x.stm.SendElement(iq.ForbiddenError())
 	}
 }
 
@@ -82,11 +92,11 @@ func (x *LastActivity) sendUserLastActivity(iq *xmpp.IQ, to *jid.JID) {
 	usr, err := storage.Instance().FetchUser(to.Node())
 	if err != nil {
 		log.Error(err)
-		x.stm.SendElement(iq.InternalServerError())
+		router.Route(iq.InternalServerError())
 		return
 	}
 	if usr == nil {
-		x.stm.SendElement(iq.ItemNotFoundError())
+		router.Route(iq.ItemNotFoundError())
 		return
 	}
 	var secs int
@@ -106,5 +116,20 @@ func (x *LastActivity) sendReply(iq *xmpp.IQ, secs int, status string) {
 	q.SetAttribute("seconds", strconv.Itoa(secs))
 	res := iq.ResultIQ()
 	res.AppendElement(q)
-	x.stm.SendElement(res)
+	router.Route(res)
+}
+
+func (x *LastActivity) isSubscribedTo(contact *jid.JID, userJID *jid.JID) bool {
+	if contact.Matches(userJID, jid.MatchesBare) {
+		return true
+	}
+	ri, err := storage.Instance().FetchRosterItem(userJID.Node(), contact.ToBareJID().String())
+	if err != nil {
+		log.Error(err)
+		return false
+	}
+	if ri == nil {
+		return false
+	}
+	return ri.Subscription == rostermodel.SubscriptionTo || ri.Subscription == rostermodel.SubscriptionBoth
 }

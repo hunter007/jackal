@@ -8,7 +8,6 @@ package xep0077
 import (
 	"github.com/ortuman/jackal/log"
 	"github.com/ortuman/jackal/model"
-	"github.com/ortuman/jackal/module/xep0030"
 	"github.com/ortuman/jackal/storage"
 	"github.com/ortuman/jackal/stream"
 	"github.com/ortuman/jackal/xmpp"
@@ -37,13 +36,6 @@ func New(config *Config, stm stream.C2S) *Register {
 		cfg: config,
 		stm: stm,
 	}
-}
-
-// RegisterDisco registers disco entity features/items
-// associated to register module.
-func (x *Register) RegisterDisco(discoInfo *xep0030.DiscoInfo) {
-	// register disco feature
-	discoInfo.Entity(x.stm.Domain(), "").AddFeature(registerNamespace)
 }
 
 // MatchesIQ returns whether or not an IQ should be

@@ -10,12 +10,13 @@ import (
 	"strings"
 
 	"github.com/ortuman/jackal/log"
+	"github.com/ortuman/jackal/module/xep0030"
 	"github.com/ortuman/jackal/router"
 	"github.com/ortuman/jackal/version"
 	"github.com/ortuman/jackal/xmpp"
 )
 
-const mailboxSize = 4096
+const mailboxSize = 1024
 
 const versionNamespace = "jabber:iq:version"
 
@@ -31,7 +32,7 @@ type Config struct {
 	ShowOS bool `yaml:"show_os"`
 }
 
-// Version represents a version server stream module.
+// Version represents a version module.
 type Version struct {
 	cfg        *Config
 	actorCh    chan func()
@@ -39,20 +40,15 @@ type Version struct {
 }
 
 // New returns a version IQ handler module.
-func New(config *Config, shutdownCh <-chan struct{}) *Version {
+func New(config *Config, disco *xep0030.DiscoInfo, shutdownCh <-chan struct{}) *Version {
 	v := &Version{
 		cfg:        config,
 		actorCh:    make(chan func(), mailboxSize),
 		shutdownCh: shutdownCh,
 	}
 	go v.loop()
+	disco.RegisterServerFeature(versionNamespace)
 	return v
-}
-
-// Features returns disco entity features
-// associated to version module.
-func (x *Version) Features() []string {
-	return []string{versionNamespace}
 }
 
 // MatchesIQ returns whether or not an IQ should be
@@ -88,8 +84,9 @@ func (x *Version) processIQ(iq *xmpp.IQ) {
 }
 
 func (x *Version) sendSoftwareVersion(iq *xmpp.IQ) {
-	username := iq.FromJID().Node()
-	resource := iq.FromJID().Resource()
+	fromJID := iq.FromJID()
+	username := fromJID.Node()
+	resource := fromJID.Resource()
 	log.Infof("retrieving software version: %v (%s/%s)", version.ApplicationVersion, username, resource)
 
 	result := iq.ResultIQ()

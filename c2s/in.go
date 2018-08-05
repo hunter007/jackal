@@ -16,16 +16,6 @@ import (
 	"github.com/ortuman/jackal/host"
 	"github.com/ortuman/jackal/log"
 	"github.com/ortuman/jackal/module"
-	"github.com/ortuman/jackal/module/offline"
-	"github.com/ortuman/jackal/module/roster"
-	"github.com/ortuman/jackal/module/xep0012"
-	"github.com/ortuman/jackal/module/xep0030"
-	"github.com/ortuman/jackal/module/xep0049"
-	"github.com/ortuman/jackal/module/xep0054"
-	"github.com/ortuman/jackal/module/xep0077"
-	"github.com/ortuman/jackal/module/xep0092"
-	"github.com/ortuman/jackal/module/xep0191"
-	"github.com/ortuman/jackal/module/xep0199"
 	"github.com/ortuman/jackal/router"
 	"github.com/ortuman/jackal/session"
 	"github.com/ortuman/jackal/stream"
@@ -57,21 +47,6 @@ const (
 	presenceCtxKey         = "stream:presence"
 	offlineDeliveredCtxKey = "stream:offlineDelivered"
 )
-
-type modules struct {
-	roster       *roster.Roster
-	offline      *offline.Offline
-	lastActivity *xep0012.LastActivity
-	discoInfo    *xep0030.DiscoInfo
-	private      *xep0049.Private
-	vCard        *xep0054.VCard
-	register     *xep0077.Register
-	version      *xep0092.Version
-	blockingCmd  *xep0191.BlockingCommand
-	ping         *xep0199.Ping
-	iqHandlers   []module.IQHandler
-	all          []module.Module
-}
 
 type inStream struct {
 	cfg            *streamConfig

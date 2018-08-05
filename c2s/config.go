@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ortuman/jackal/module"
 	"github.com/ortuman/jackal/transport"
 	"github.com/ortuman/jackal/transport/compress"
 )
@@ -199,5 +198,4 @@ type streamConfig struct {
 	resourceConflict ResourceConflictPolicy
 	sasl             []string
 	compression      CompressConfig
-	modules          *module.Config
 }

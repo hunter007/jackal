@@ -7,7 +7,6 @@ package offline
 
 import (
 	"github.com/ortuman/jackal/log"
-	"github.com/ortuman/jackal/module/xep0030"
 	"github.com/ortuman/jackal/storage"
 	"github.com/ortuman/jackal/stream"
 	"github.com/ortuman/jackal/xmpp"
@@ -36,12 +35,6 @@ func New(config *Config, stm stream.C2S) *Offline {
 	}
 	go r.actorLoop(stm.Context().Done())
 	return r
-}
-
-// RegisterDisco registers disco entity features/items
-// associated to offline module.
-func (o *Offline) RegisterDisco(discoInfo *xep0030.DiscoInfo) {
-	discoInfo.Entity(o.stm.Domain(), "").AddFeature(offlineNamespace)
 }
 
 // ArchiveMessage archives a new offline messages into the storage.

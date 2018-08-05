@@ -12,7 +12,6 @@ import (
 
 	"github.com/ortuman/jackal/errors"
 	"github.com/ortuman/jackal/log"
-	"github.com/ortuman/jackal/module/xep0030"
 	"github.com/ortuman/jackal/stream"
 	"github.com/ortuman/jackal/xmpp"
 	"github.com/pborman/uuid"
@@ -48,13 +47,6 @@ func New(config *Config, stm stream.C2S) *Ping {
 		stm:    stm,
 		pongCh: make(chan struct{}, 1),
 	}
-}
-
-// RegisterDisco registers disco entity features/items
-// associated to ping module.
-func (x *Ping) RegisterDisco(discoInfo *xep0030.DiscoInfo) {
-	discoInfo.Entity(x.stm.Domain(), "").AddFeature(pingNamespace)
-	discoInfo.Entity(x.stm.JID().ToBareJID().String(), "").AddFeature(pingNamespace)
 }
 
 // MatchesIQ returns whether or not an IQ should be
