@@ -60,7 +60,7 @@ const (
 // All incoming <presence> elements providing from the
 // stream will automatically be converted to Presence objects.
 type Presence struct {
-	Element
+	stanzaElement
 	showState ShowState
 	priority  int8
 }
@@ -90,7 +90,7 @@ func NewPresenceFromElement(e XElement, from *jid.JID, to *jid.JID) (*Presence, 
 		return nil, err
 	}
 	p.SetTo(to.String())
-	p.SetFrom(from.String())
+	p.setFromJID(from)
 	p.SetNamespace("")
 	return p, nil
 }

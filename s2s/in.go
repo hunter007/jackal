@@ -186,7 +186,8 @@ func (s *inStream) handleConnected(elem xmpp.XElement) {
 		s.verifyDialbackKey(elem)
 
 	default:
-		if elem.IsStanza() {
+		switch elem := elem.(type) {
+		case xmpp.Stanza:
 			if presence, ok := elem.(*xmpp.Presence); ok && s.ph != nil && presence.ToJID().IsBare() {
 				s.ph.ProcessPresence(presence)
 				return
@@ -263,7 +264,7 @@ func (s *inStream) failAuthentication(reason, text string) {
 
 func (s *inStream) authorizeDialbackKey(elem xmpp.XElement) {
 	if !host.IsLocalHost(elem.To()) {
-		s.writeElement(xmpp.NewErrorElementFromElement(elem, xmpp.ErrItemNotFound, nil))
+		s.writeStanzaErrorResponse(elem, xmpp.ErrItemNotFound)
 		return
 	}
 	log.Infof("authorizing dialback key: %s...", elem.Text())
@@ -271,7 +272,7 @@ func (s *inStream) authorizeDialbackKey(elem xmpp.XElement) {
 	outCfg, err := s.cfg.dialer.dial(elem.To(), elem.From())
 	if err != nil {
 		log.Error(err)
-		s.writeElement(xmpp.NewErrorElementFromElement(elem, xmpp.ErrRemoteServerNotFound, nil))
+		s.writeStanzaErrorResponse(elem, xmpp.ErrRemoteServerNotFound)
 		return
 	}
 	// create verify element
@@ -303,14 +304,14 @@ func (s *inStream) authorizeDialbackKey(elem xmpp.XElement) {
 
 	case <-outStm.done():
 		// remote server closed connection unexpectedly
-		s.writeElement(xmpp.NewErrorElementFromElement(elem, xmpp.ErrRemoteServerTimeout, nil))
+		s.writeStanzaErrorResponse(elem, xmpp.ErrRemoteServerTimeout)
 		break
 	}
 }
 
 func (s *inStream) verifyDialbackKey(elem xmpp.XElement) {
 	if !host.IsLocalHost(elem.To()) {
-		s.writeElement(xmpp.NewErrorElementFromElement(elem, xmpp.ErrItemNotFound, nil))
+		s.writeStanzaErrorResponse(elem, xmpp.ErrItemNotFound)
 		return
 	}
 	dbVerify := xmpp.NewElementName("db:verify")
@@ -327,6 +328,15 @@ func (s *inStream) verifyDialbackKey(elem xmpp.XElement) {
 		dbVerify.SetType("invalid")
 	}
 	s.writeElement(dbVerify)
+}
+
+func (s *inStream) writeStanzaErrorResponse(elem xmpp.XElement, stanzaErr *xmpp.StanzaError) {
+	resp := xmpp.NewElementFromElement(elem)
+	resp.SetType(xmpp.ErrorType)
+	resp.SetFrom(elem.To())
+	resp.SetTo(elem.From())
+	resp.AppendElement(stanzaErr.Element())
+	s.writeElement(resp)
 }
 
 func (s *inStream) writeElement(elem xmpp.XElement) {
@@ -349,7 +359,7 @@ func (s *inStream) handleSessionError(sErr *session.Error) {
 	case *streamerror.Error:
 		s.disconnectWithStreamError(err)
 	case *xmpp.StanzaError:
-		s.writeElement(xmpp.NewErrorElementFromElement(sErr.Element, err, nil))
+		s.writeStanzaErrorResponse(sErr.Element, err)
 	default:
 		log.Error(err)
 		s.disconnectWithStreamError(streamerror.ErrUndefinedCondition)

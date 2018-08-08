@@ -29,7 +29,7 @@ const (
 // All incoming <message> elements providing from the
 // stream will automatically be converted to Message objects.
 type Message struct {
-	Element
+	stanzaElement
 }
 
 // NewMessageFromElement creates a Message object from XElement.
@@ -43,8 +43,8 @@ func NewMessageFromElement(e XElement, from *jid.JID, to *jid.JID) (*Message, er
 	}
 	m := &Message{}
 	m.copyFrom(e)
-	m.SetTo(to.String())
-	m.SetFrom(from.String())
+	m.setToJID(to)
+	m.setFromJID(from)
 	m.SetNamespace("")
 	return m, nil
 }

@@ -151,7 +151,7 @@ func (di *DiscoInfo) processIQ(iq *xmpp.IQ) {
 func (di *DiscoInfo) sendDiscoInfo(prov Provider, toJID, fromJID *jid.JID, node string, iq *xmpp.IQ) {
 	features, sErr := prov.Features(toJID, fromJID, node)
 	if sErr != nil {
-		router.Route(xmpp.NewErrorElementFromElement(iq, sErr, nil))
+		router.Route(xmpp.NewErrorStanzaFromStanza(iq, sErr, nil))
 		return
 	} else if len(features) == 0 {
 		router.Route(iq.ItemNotFoundError())
@@ -184,7 +184,7 @@ func (di *DiscoInfo) sendDiscoInfo(prov Provider, toJID, fromJID *jid.JID, node 
 func (di *DiscoInfo) sendDiscoItems(prov Provider, toJID, fromJID *jid.JID, node string, iq *xmpp.IQ) {
 	items, sErr := prov.Items(toJID, fromJID, node)
 	if sErr != nil {
-		router.Route(xmpp.NewErrorElementFromElement(iq, sErr, nil))
+		router.Route(xmpp.NewErrorStanzaFromStanza(iq, sErr, nil))
 		return
 	} else if len(items) == 0 {
 		router.Route(iq.ItemNotFoundError())

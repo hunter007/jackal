@@ -71,9 +71,7 @@ func (o *Offline) archiveMessage(message *xmpp.Message) {
 		return
 	}
 	if queueSize >= o.cfg.QueueSize {
-		response := xmpp.NewElementFromElement(message)
-		response.SetFrom(toJid.String())
-		response.SetTo(o.stm.JID().String())
+		response, _ := xmpp.NewMessageFromElement(message, message.ToJID(), message.FromJID())
 		o.stm.SendElement(response.ServiceUnavailableError())
 		return
 	}

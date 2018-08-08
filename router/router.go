@@ -119,13 +119,13 @@ func ReloadBlockList(username string) {
 
 // Route routes a stanza applying server rules for handling XML stanzas.
 // (https://xmpp.org/rfcs/rfc3921.html#rules)
-func Route(elem xmpp.XElement) error {
+func Route(elem xmpp.Stanza) error {
 	return instance().route(elem, false)
 }
 
 // MustRoute routes a stanza applying server rules for handling XML stanzas
 // ignoring blocking lists.
-func MustRoute(elem xmpp.XElement) error {
+func MustRoute(elem xmpp.Stanza) error {
 	return instance().route(elem, true)
 }
 
@@ -236,7 +236,7 @@ func (r *router) getBlockList(username string) []*jid.JID {
 	return bl
 }
 
-func (r *router) route(element xmpp.XElement, ignoreBlocking bool) error {
+func (r *router) route(element xmpp.Stanza, ignoreBlocking bool) error {
 	toJID := element.ToJID()
 	if !ignoreBlocking && !toJID.IsServer() {
 		if r.isBlockedJID(element.FromJID(), toJID.Node()) {
@@ -292,18 +292,18 @@ func (r *router) route(element xmpp.XElement, ignoreBlocking bool) error {
 	return nil
 }
 
-func (r *router) remoteRoute(element xmpp.XElement) error {
+func (r *router) remoteRoute(elem xmpp.Stanza) error {
 	if r.cfg.GetS2SOut == nil {
 		return ErrFailedRemoteConnect
 	}
-	localDomain := element.FromJID().Domain()
-	remoteDomain := element.ToJID().Domain()
+	localDomain := elem.FromJID().Domain()
+	remoteDomain := elem.ToJID().Domain()
 
 	out, err := r.cfg.GetS2SOut(localDomain, remoteDomain)
 	if err != nil {
 		log.Error(err)
 		return ErrFailedRemoteConnect
 	}
-	out.SendElement(element)
+	out.SendElement(elem)
 	return nil
 }

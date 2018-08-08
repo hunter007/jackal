@@ -10,10 +10,7 @@ import (
 	"io"
 
 	"github.com/ortuman/jackal/xmpp/jid"
-	"github.com/pkg/errors"
 )
-
-var ErrInvalidStanzaName = errors.New("xmpp: invalid stanza name")
 
 // Element represents a generic and mutable XML node element.
 type Element struct {
@@ -43,13 +40,13 @@ func NewElementFromElement(elem XElement) *Element {
 	return e
 }
 
-// NewErrorElementFromElement returns a copy of an element of stanza error class.
-func NewErrorElementFromElement(elem XElement, stanzaErr *StanzaError, errorElements []XElement) *Element {
-	e := &Element{}
+// NewErrorStanzaFromStanza returns a copy of an element of stanza error class.
+func NewErrorStanzaFromStanza(elem Stanza, stanzaErr *StanzaError, errorElements []XElement) Stanza {
+	e := &stanzaElement{}
 	e.copyFrom(elem)
-	e.SetType("error")
-	e.SetFrom(elem.To())
-	e.SetTo(elem.From())
+	e.SetType(ErrorType)
+	e.setFromJID(elem.ToJID())
+	e.setToJID(elem.FromJID())
 	errEl := stanzaErr.Element()
 	errEl.AppendElements(errorElements)
 	e.AppendElement(errEl)
@@ -107,19 +104,9 @@ func (e *Element) From() string {
 	return e.attrs.Get("from")
 }
 
-func (e *Element) FromJID() *jid.JID {
-	j, _ := jid.NewWithString(e.From(), true)
-	return j
-}
-
 // To returns 'to' node attribute.
 func (e *Element) To() string {
 	return e.attrs.Get("to")
-}
-
-func (e *Element) ToJID() *jid.JID {
-	j, _ := jid.NewWithString(e.To(), true)
-	return j
 }
 
 // Type returns 'type' node attribute.
@@ -218,4 +205,30 @@ func (e *Element) copyFrom(el XElement) {
 	e.text = el.Text()
 	e.attrs.copyFrom(el.Attributes().(attributeSet))
 	e.elements.copyFrom(el.Elements().(elementSet))
+}
+
+type stanzaElement struct {
+	Element
+	fromJID *jid.JID
+	toJID   *jid.JID
+}
+
+// ToJID returns iq 'from' JID value.
+func (r *stanzaElement) ToJID() *jid.JID {
+	return r.toJID
+}
+
+func (r *stanzaElement) setToJID(j *jid.JID) {
+	r.toJID = j
+	r.SetTo(j.String())
+}
+
+// FromJID returns presence 'from' JID value.
+func (r *stanzaElement) FromJID() *jid.JID {
+	return r.fromJID
+}
+
+func (r *stanzaElement) setFromJID(j *jid.JID) {
+	r.fromJID = j
+	r.SetFrom(j.String())
 }

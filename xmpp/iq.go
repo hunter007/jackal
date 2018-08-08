@@ -27,7 +27,7 @@ const (
 // All incoming <iq> elements providing from the
 // stream will automatically be converted to IQ objects.
 type IQ struct {
-	Element
+	stanzaElement
 }
 
 // NewIQFromElement creates an IQ object from XElement.
@@ -53,8 +53,8 @@ func NewIQFromElement(e XElement, from *jid.JID, to *jid.JID) (*IQ, error) {
 	}
 	iq := &IQ{}
 	iq.copyFrom(e)
-	iq.SetTo(to.String())
-	iq.SetFrom(from.String())
+	iq.setToJID(to)
+	iq.setFromJID(from)
 	iq.SetNamespace("")
 	return iq, nil
 }

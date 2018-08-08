@@ -169,132 +169,132 @@ var (
 
 // BadRequestError returns an error copy of the element
 // attaching 'bad-request' error sub element.
-func (el *Element) BadRequestError() XElement {
-	return NewErrorElementFromElement(el, ErrBadRequest, nil)
+func (el *stanzaElement) BadRequestError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrBadRequest, nil)
 }
 
 // ConflictError returns an error copy of the element
 // attaching 'conflict' error sub element.
-func (el *Element) ConflictError() XElement {
-	return NewErrorElementFromElement(el, ErrConflict, nil)
+func (el *stanzaElement) ConflictError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrConflict, nil)
 }
 
 // FeatureNotImplementedError returns an error copy of the element
 // attaching 'feature-not-implemented' error sub element.
-func (el *Element) FeatureNotImplementedError() XElement {
-	return NewErrorElementFromElement(el, ErrFeatureNotImplemented, nil)
+func (el *stanzaElement) FeatureNotImplementedError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrFeatureNotImplemented, nil)
 }
 
 // ForbiddenError returns an error copy of the element
 // attaching 'forbidden' error sub element.
-func (el *Element) ForbiddenError() XElement {
-	return NewErrorElementFromElement(el, ErrForbidden, nil)
+func (el *stanzaElement) ForbiddenError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrForbidden, nil)
 }
 
 // GoneError returns an error copy of the element
 // attaching 'gone' error sub element.
-func (el *Element) GoneError() XElement {
-	return NewErrorElementFromElement(el, ErrGone, nil)
+func (el *stanzaElement) GoneError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrGone, nil)
 }
 
 // InternalServerError returns an error copy of the element
 // attaching 'internal-server-error' error sub element.
-func (el *Element) InternalServerError() XElement {
-	return NewErrorElementFromElement(el, ErrInternalServerError, nil)
+func (el *stanzaElement) InternalServerError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrInternalServerError, nil)
 }
 
 // ItemNotFoundError returns an error copy of the element
 // attaching 'item-not-found' error sub element.
-func (el *Element) ItemNotFoundError() XElement {
-	return NewErrorElementFromElement(el, ErrItemNotFound, nil)
+func (el *stanzaElement) ItemNotFoundError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrItemNotFound, nil)
 }
 
 // JidMalformedError returns an error copy of the element
 // attaching 'jid-malformed' error sub element.
-func (el *Element) JidMalformedError() XElement {
-	return NewErrorElementFromElement(el, ErrJidMalformed, nil)
+func (el *stanzaElement) JidMalformedError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrJidMalformed, nil)
 }
 
 // NotAcceptableError returns an error copy of the element
 // attaching 'not-acceptable' error sub element.
-func (el *Element) NotAcceptableError() XElement {
-	return NewErrorElementFromElement(el, ErrNotAcceptable, nil)
+func (el *stanzaElement) NotAcceptableError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrNotAcceptable, nil)
 }
 
 // NotAllowedError returns an error copy of the element
 // attaching 'not-allowed' error sub element.
-func (el *Element) NotAllowedError() XElement {
-	return NewErrorElementFromElement(el, ErrNotAllowed, nil)
+func (el *stanzaElement) NotAllowedError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrNotAllowed, nil)
 }
 
 // NotAuthorizedError returns an error copy of the element
 // attaching 'not-authorized' error sub element.
-func (el *Element) NotAuthorizedError() XElement {
-	return NewErrorElementFromElement(el, ErrNotAuthorized, nil)
+func (el *stanzaElement) NotAuthorizedError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrNotAuthorized, nil)
 }
 
 // PaymentRequiredError returns an error copy of the element
 // attaching 'payment-required' error sub element.
-func (el *Element) PaymentRequiredError() XElement {
-	return NewErrorElementFromElement(el, ErrPaymentRequired, nil)
+func (el *stanzaElement) PaymentRequiredError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrPaymentRequired, nil)
 }
 
 // RecipientUnavailableError returns an error copy of the element
 // attaching 'recipient-unavailable' error sub element.
-func (el *Element) RecipientUnavailableError() XElement {
-	return NewErrorElementFromElement(el, ErrRecipientUnavailable, nil)
+func (el *stanzaElement) RecipientUnavailableError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrRecipientUnavailable, nil)
 }
 
 // RedirectError returns an error copy of the element
 // attaching 'redirect' error sub element.
-func (el *Element) RedirectError() XElement {
-	return NewErrorElementFromElement(el, ErrRedirect, nil)
+func (el *stanzaElement) RedirectError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrRedirect, nil)
 }
 
 // RegistrationRequiredError returns an error copy of the element
 // attaching 'registration-required' error sub element.
-func (el *Element) RegistrationRequiredError() XElement {
-	return NewErrorElementFromElement(el, ErrRegistrationRequired, nil)
+func (el *stanzaElement) RegistrationRequiredError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrRegistrationRequired, nil)
 }
 
 // RemoteServerNotFoundError returns an error copy of the element
 // attaching 'remote-server-not-found' error sub element.
-func (el *Element) RemoteServerNotFoundError() XElement {
-	return NewErrorElementFromElement(el, ErrRemoteServerNotFound, nil)
+func (el *stanzaElement) RemoteServerNotFoundError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrRemoteServerNotFound, nil)
 }
 
 // RemoteServerTimeoutError returns an error copy of the element
 // attaching 'remote-server-timeout' error sub element.
-func (el *Element) RemoteServerTimeoutError() XElement {
-	return NewErrorElementFromElement(el, ErrRemoteServerTimeout, nil)
+func (el *stanzaElement) RemoteServerTimeoutError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrRemoteServerTimeout, nil)
 }
 
 // ResourceConstraintError returns an error copy of the element
 // attaching 'resource-constraint' error sub element.
-func (el *Element) ResourceConstraintError() XElement {
-	return NewErrorElementFromElement(el, ErrResourceConstraint, nil)
+func (el *stanzaElement) ResourceConstraintError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrResourceConstraint, nil)
 }
 
 // ServiceUnavailableError returns an error copy of the element
 // attaching 'service-unavailable' error sub element.
-func (el *Element) ServiceUnavailableError() XElement {
-	return NewErrorElementFromElement(el, ErrServiceUnavailable, nil)
+func (el *stanzaElement) ServiceUnavailableError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrServiceUnavailable, nil)
 }
 
 // SubscriptionRequiredError returns an error copy of the element
 // attaching 'subscription-required' error sub element.
-func (el *Element) SubscriptionRequiredError() XElement {
-	return NewErrorElementFromElement(el, ErrSubscriptionRequired, nil)
+func (el *stanzaElement) SubscriptionRequiredError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrSubscriptionRequired, nil)
 }
 
 // UndefinedConditionError returns an error copy of the element
 // attaching 'undefined-condition' error sub element.
-func (el *Element) UndefinedConditionError() XElement {
-	return NewErrorElementFromElement(el, ErrUndefinedCondition, nil)
+func (el *stanzaElement) UndefinedConditionError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrUndefinedCondition, nil)
 }
 
 // UnexpectedConditionError returns an error copy of the element
 // attaching 'unexpected-condition' error sub element.
-func (el *Element) UnexpectedConditionError() XElement {
-	return NewErrorElementFromElement(el, ErrUnexpectedCondition, nil)
+func (el *stanzaElement) UnexpectedConditionError() Stanza {
+	return NewErrorStanzaFromStanza(el, ErrUnexpectedCondition, nil)
 }

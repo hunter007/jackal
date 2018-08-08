@@ -235,7 +235,7 @@ func (s *Session) Receive() (xmpp.XElement, *Error) {
 	return elem, nil
 }
 
-func (s *Session) buildStanza(elem xmpp.XElement) (xmpp.XElement, *Error) {
+func (s *Session) buildStanza(elem xmpp.XElement) (xmpp.Stanza, *Error) {
 	if err := s.validateNamespace(elem); err != nil {
 		return nil, err
 	}

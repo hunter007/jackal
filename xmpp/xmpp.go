@@ -38,12 +38,16 @@ type XElement interface {
 	Type() string
 
 	IsStanza() bool
-	FromJID() *jid.JID
-	ToJID() *jid.JID
 
 	IsError() bool
 	Error() XElement
 
 	ToXML(w io.Writer, includeClosing bool)
 	ToGob(enc *gob.Encoder)
+}
+
+type Stanza interface {
+	XElement
+	FromJID() *jid.JID
+	ToJID() *jid.JID
 }

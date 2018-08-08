@@ -287,6 +287,15 @@ func (s *outStream) finishVerification() {
 	s.setState(outVerified)
 }
 
+func (s *outStream) writeStanzaErrorResponse(elem xmpp.XElement, stanzaErr *xmpp.StanzaError) {
+	resp := xmpp.NewElementFromElement(elem)
+	resp.SetType(xmpp.ErrorType)
+	resp.SetFrom(elem.To())
+	resp.SetTo(elem.From())
+	resp.AppendElement(stanzaErr.Element())
+	s.writeElement(resp)
+}
+
 func (s *outStream) writeElement(elem xmpp.XElement) {
 	s.sess.Send(elem)
 }
@@ -307,7 +316,7 @@ func (s *outStream) handleSessionError(sErr *session.Error) {
 	case *streamerror.Error:
 		s.disconnectWithStreamError(err)
 	case *xmpp.StanzaError:
-		s.writeElement(xmpp.NewErrorElementFromElement(sErr.Element, err, nil))
+		s.writeStanzaErrorResponse(sErr.Element, err)
 	default:
 		log.Error(err)
 		s.disconnectWithStreamError(streamerror.ErrUndefinedCondition)

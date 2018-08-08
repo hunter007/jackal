@@ -382,14 +382,15 @@ func (s *inStream) handleSessionStarted(elem xmpp.XElement) {
 	// if p := s.mods.ping; p != nil {
 	//	p.ResetDeadline()
 	//}
-	if !elem.IsStanza() {
+	stanza, ok := elem.(xmpp.Stanza)
+	if !ok {
 		s.disconnectWithStreamError(streamerror.ErrUnsupportedStanzaType)
 		return
 	}
-	if comp := component.Get(elem.ToJID().Domain()); comp != nil { // component stanza?
-		comp.ProcessStanza(elem)
+	if comp := component.Get(stanza.ToJID().Domain()); comp != nil { // component stanza?
+		comp.ProcessStanza(stanza)
 	} else {
-		s.processStanza(elem)
+		s.processStanza(stanza)
 	}
 }
 
@@ -584,11 +585,11 @@ func (s *inStream) startSession(iq *xmpp.IQ) {
 	s.setState(sessionStarted)
 }
 
-func (s *inStream) processStanza(elem xmpp.XElement) {
+func (s *inStream) processStanza(elem xmpp.Stanza) {
 	toJID := elem.ToJID()
 	if s.isBlockedJID(toJID) { // blocked JID?
 		blocked := xmpp.NewElementNamespace("blocked", blockedErrorNamespace)
-		resp := xmpp.NewErrorElementFromElement(elem, xmpp.ErrNotAcceptable, []xmpp.XElement{blocked})
+		resp := xmpp.NewErrorStanzaFromStanza(elem, xmpp.ErrNotAcceptable, []xmpp.XElement{blocked})
 		s.writeElement(resp)
 		return
 	}
@@ -724,11 +725,20 @@ func (s *inStream) handleSessionError(sErr *session.Error) {
 	case *streamerror.Error:
 		s.disconnectWithStreamError(err)
 	case *xmpp.StanzaError:
-		s.writeElement(xmpp.NewErrorElementFromElement(sErr.Element, err, nil))
+		s.writeStanzaErrorResponse(sErr.Element, err)
 	default:
 		log.Error(err)
 		s.disconnectWithStreamError(streamerror.ErrUndefinedCondition)
 	}
+}
+
+func (s *inStream) writeStanzaErrorResponse(elem xmpp.XElement, stanzaErr *xmpp.StanzaError) {
+	resp := xmpp.NewElementFromElement(elem)
+	resp.SetType(xmpp.ErrorType)
+	resp.SetFrom(resp.To())
+	resp.SetTo(s.JID().String())
+	resp.AppendElement(stanzaErr.Element())
+	s.writeElement(resp)
 }
 
 func (s *inStream) writeElement(elem xmpp.XElement) {

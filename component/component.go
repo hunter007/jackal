@@ -17,7 +17,7 @@ import (
 type Component interface {
 	Host() string
 	ServiceName() string
-	ProcessStanza(stanza xmpp.XElement)
+	ProcessStanza(stanza xmpp.Stanza)
 	Shutdown()
 }
 
